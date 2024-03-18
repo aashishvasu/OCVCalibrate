@@ -1,0 +1,53 @@
+cmake_minimum_required(VERSION 3.10)
+
+# Project Name
+project(OCVCalibrate)
+
+# Require C++11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+# wxWidgets setup
+find_package(wxWidgets COMPONENTS net core base REQUIRED)
+include(${wxWidgets_USE_FILE})
+
+# OpenCV setup
+find_package(OpenCV REQUIRED)
+
+# Include directories
+include_directories(
+    ${wxWidgets_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+# Define source and header files
+file(GLOB_RECURSE HEADER_FILES "include/*.h")
+file(GLOB_RECURSE SRC_FILES "src/*.cpp")
+
+# Optional: Print file lists for debugging
+message("HEADER_FILES = ${HEADER_FILES}")
+message("SRC_FILES = ${SRC_FILES}")
+
+# Add executable
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SRC_FILES})
+
+# Set the output directory for the executable to be one level up
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin
+)
+
+if(WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE YES
+    )
+    # Link libraries
+    target_link_libraries(${PROJECT_NAME}
+        debug ${wxWidgets_LIBRARIES} ${OpenCV_LIBS}
+        optimized ${wxWidgets_LIBRARIES} ${OpenCV_LIBS}
+    )
+     # Any other Windows-specific configurations
+elseif(UNIX)
+    # Link libraries
+    target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES} ${OpenCV_LIBS})
+endif()
